@@ -1,7 +1,6 @@
 import express from 'express';
-
-
 import PlanTeam from '../models/PlanTeam';
+import updatePlanTeam from '../works/updatePlanTeam';
 
 var router = express.Router();
 
@@ -9,7 +8,7 @@ var router = express.Router();
 
 // GET ALL PlanTeam
 router.get('/', (req, res) => {
-  PlanTeam.find((err, listPlanTeam) => {
+  PlanTeam.find({},(err, listPlanTeam) => {
     if (err) return res.status(500).send({
       error: 'database failure'
     });
@@ -56,47 +55,16 @@ router.post('/', (req, res) => {
 
 
 // UPDATE THE PlanTeam
-router.put('/:idPlanTeam', async (req, res, next) => {
-  try {
+router.put('/:idPlanTeam', (req, res) => {
   
-    if (req.body.filter && req.body.update) {
-      
-      const filter = req.body.filter;
-      const update = req.body.update;
-      const option = {returnNewDocument: true};
-      
-      const result = await PlanTeam.findOneAndUpdate(filter, update, option);
-      
-      return new Promise((resolve, reject)=> {
-        if (!result) { console.log('already exists or error'); return;}
-        else { console.log('sucessfully updated'); resolve(result); }
-      })
-      
-    } else { res.json( { error: 'filter & update obj are needed' }) }
-    
-  } catch(error) {next(error)}
+  
+  if (req.body.update) {
+    updatePlanTeam(req.body.filter, req.body.update).catch(e=>{console.log(e)});
+    res.json( { message: 'worked anyway' });
+  } else {res.json( { error: 'update info is needed' }) }
+  
   
 });
-
-
-
-
-// DELETE PlanTeam
-router.delete('/:idPlanTeam', (req, res) => {
-  PlanTeam.remove({ _id: req.params.idPlanTeam }, (err, output) => {
-    if(err) return res.status(500).json({ error: "database failure" });
-
-    /* ( SINCE DELETE OPERATION IS IDEMPOTENT, NO NEED TO SPECIFY )
-    if(!output.result.n) return res.status(404).json({ error: "PlanTeam not found" });
-    res.json({ message: "PlanTeam deleted" });
-    */
-
-    res.status(204).end();
-  })
-});
-
-
-module.exports = router;
 /*
 router.put('/:idPlanTeam', (req, res) => {
   
@@ -116,3 +84,20 @@ router.put('/:idPlanTeam', (req, res) => {
 
 });
 */
+
+// DELETE PlanTeam
+router.delete('/:idPlanTeam', (req, res) => {
+  PlanTeam.remove({ _id: req.params.idPlanTeam }, (err, output) => {
+    if(err) return res.status(500).json({ error: "database failure" });
+
+    /* ( SINCE DELETE OPERATION IS IDEMPOTENT, NO NEED TO SPECIFY )
+    if(!output.result.n) return res.status(404).json({ error: "PlanTeam not found" });
+    res.json({ message: "PlanTeam deleted" });
+    */
+
+    res.status(204).end();
+  })
+});
+
+
+module.exports = router;

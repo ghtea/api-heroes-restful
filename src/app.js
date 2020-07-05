@@ -28,6 +28,7 @@ mongoose
 .connect(process.env.DB_URL, {
 useUnifiedTopology: true,
 useNewUrlParser: true,
+useFindAndModify: false
 })
 .then(() => console.log('DB Connected!'))
 .catch(err => {
@@ -36,9 +37,14 @@ console.log(`DB Connection Error: ${err.message}`);
 
 
 
-
-
 const port = parseInt(process.env.PORT);
 app.listen(port, () =>
   console.log(`Example app listening on port ${port}!`),
 );
+
+
+
+/*
+useFindAndModify: false
+https://mongoosejs.com/docs/deprecations.html#findandmodify
+*/

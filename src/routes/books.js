@@ -4,8 +4,8 @@ var Book = require('../models/Book');
 var router = express.Router();
 
 // GET ALL BOOKS
-router.get('', (req, res) => {
-  Book.find((err, books) => {
+router.get('/', (req, res) => {
+  Book.find({},(err, books) => {
     if (err) return res.status(500).send({
       error: 'database failure'
     });
