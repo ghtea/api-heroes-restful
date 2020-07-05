@@ -4,7 +4,14 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
 
- 
+import Book from './models/Book';
+
+const HeroBasic = require('./models/HeroBasic');
+const PlanTeam = require('./models/PlanTeam');
+const PlayerMmr = require('./models/PlayerMmr');
+
+
+
 dotenv.config({ 
   path: './.env' 
 });
@@ -12,13 +19,10 @@ dotenv.config({
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
 app.use(cors());
 
-
-var Book = require('./models/book');
-var router = require('./routes')(app, Book);
-
+app.use('/books', require('./routes/books'));
+app.use('/PlanTeam', require('./routes/PlanTeam'));
 
 mongoose
 .connect(process.env.DB_URL, {

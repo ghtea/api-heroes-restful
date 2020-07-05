@@ -7,4 +7,4 @@ var bookSchema = new Schema({
     //published_date: { type: Date, default: Date.now  }
 }, { collection: 'books', versionKey: false});
 
-module.exports = mongoose.model('book', bookSchema);
+module.exports = mongoose.model('Book', bookSchema);
