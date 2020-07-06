@@ -26,6 +26,6 @@ var schemaPlayerMmr = new Schema({
   EU: schemaRegionMmr,
   KR: schemaRegionMmr,
   CN: schemaRegionMmr
-}, { collection: 'playerMmrs', versionKey: false});
+}, { collection: 'cPlayerMmr', versionKey: false});
 
 module.exports = mongoose.model('PlayerMmr', schemaPlayerMmr);

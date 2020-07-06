@@ -41,7 +41,7 @@ var schemaTeamGenerated = new Schema({
   group: String
 });
 
-var schemaResultGenerated = new Schema({
+var schemaResultTeam = new Schema({
   _id: String,
   listTeam: [schemaTeamGenerated]
 });
@@ -55,11 +55,11 @@ var schemaPlanTeam = new Schema({
   listGroup: [String],
   
   listPlayerEntry: [schemaPlayerEntry],
-  listResult: [schemaResultGenerated],
+  listResult: [schemaResultTeam],
   
   option: String
   
-}, { collection: 'planTeams', versionKey: false});
+}, { collection: 'cPlanTeam', versionKey: false});
 
 
 
