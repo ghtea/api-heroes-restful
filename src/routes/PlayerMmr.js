@@ -1,7 +1,8 @@
 import express from 'express';
 
 import PlayerMmr from '../models/PlayerMmr';
-import resolvePlayerMmr from '../works/resolvePlayerMmr'
+import readPlayerMmr from '../works/readPlayerMmr'
+import putMmrStandardToPlayerMmr from '../works/putMmrStandardToPlayerMmr'
 
 var router = express.Router();
 
@@ -29,13 +30,16 @@ router.put('/', async (req, res, next) => {
       
       
       
-      const objPlayerMmr = await resolvePlayerMmr( req.body.filter._id );
+      const objPlayerMmr = await readPlayerMmr( req.body.filter._id );
       
       const filter = req.body.filter;
-      const update = objPlayerMmr;
+      
+      const update = putMmrStandardToPlayerMmr(objPlayerMmr, 0);
+      
       const option = {returnNewDocument: true, upsert: true }; // upser -> add if not exist
       
       const result = await PlayerMmr.findOneAndUpdate(filter, update, option);
+      
       
       res.send("ahr working"); // res 에 아무것도 안주면 응답 없다고 에러 발생!
       

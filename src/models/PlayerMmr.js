@@ -15,7 +15,8 @@ var schemaRegionMmr = new Schema({
   UD: schemaModeMmr,
   HL: schemaModeMmr,
   TL: schemaModeMmr,
-  SL: schemaModeMmr
+  SL: schemaModeMmr, 
+  STANDARD: Number
 });
 
 

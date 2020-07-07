@@ -27,8 +27,26 @@ router.get('/:idPlanTeam', (req, res) => {
   })
 });
   
-
+  
 */
+
+// READ PlanTeam
+router.get('/:idPlanTeam', async (req, res, next) => {
+  
+  try {
+  
+    const filter = { _id: req.params.idPlanTeam };
+    
+    PlanTeam.findOne(filter, (err, planTeam) => {
+      if(err) return res.status(500).json({error: err});
+      else if(!planTeam) { return res.status(404).json({error: 'PlanTeam not found'}); }
+      else { res.json(planTeam); }
+    });
+
+    
+  } catch(error) { next(error) }
+  
+});
 
 
 // ADD OR UPDATE PlanTeam   생성 수정은 이걸로 모두 해결

@@ -43,7 +43,7 @@ const getMmrOneRegion = async (battletag, idRegion, nameRegion) => {
 
 
 
-const resolvePlayerMmr = async (battletag) => {
+const readPlayerMmr = async (battletag) => {
   
   try {
     
@@ -102,4 +102,4 @@ resolvePlayerMmr(battletag);
 */
 
 
-export default resolvePlayerMmr
+export default readPlayerMmr
