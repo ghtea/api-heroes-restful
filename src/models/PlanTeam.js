@@ -3,17 +3,36 @@ var Schema = mongoose.Schema;
 
 
 
-
-
-var schemaPlayerEntry = new Schema({
+var schemaMmr = new Schema({
   _id: String,
   
-  mmrStandard: {
+  standard: {
     NA: Number,
     EU: Number,
     KR: Number,
     CN: Number 
   },
+  
+  manual: {
+    NA: Number,
+    EU: Number,
+    KR: Number,
+    CN: Number 
+  },
+  
+  updated: Date
+  
+});
+
+
+
+var schemaPlayerEntry = new Schema({
+  _id: String,
+  name: String,
+  
+  status: String,
+  
+  mmr: schemaMmr,
   
   roleGame: {
     auto: [String],
@@ -27,7 +46,6 @@ var schemaPlayerEntry = new Schema({
   language: [String],
   
   tag: [String]
-  
   
 });
 
@@ -49,6 +67,9 @@ var schemaResultTeam = new Schema({
 
 var schemaPlanTeam = new Schema({
   _id: String,
+  password: String,
+  title: String,
+  
   region: String,
   
 

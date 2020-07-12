@@ -22,7 +22,7 @@ var schemaRegionMmr = new Schema({
 
 var schemaPlayerMmr = new Schema({
   _id: String,
-  
+  updated: Date,
   NA: schemaRegionMmr,
   EU: schemaRegionMmr,
   KR: schemaRegionMmr,

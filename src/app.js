@@ -48,8 +48,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-app.use('/PlanTeam', require('./routes/PlanTeam'));
-app.use('/PlayerMmr', require('./routes/PlayerMmr'));
+app.use('/plan-team', require('./routes/plan-team'));
+app.use('/player', require('./routes/player'));
 
 mongoose
 .connect(process.env.DB_URL, {
