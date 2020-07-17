@@ -23,11 +23,11 @@ router.get('/', (req, res) => {
 
 
 // READ PlayerMmr
-router.get('/:battletag', async (req, res, next) => {
+router.get('/read-mmr', async (req, res, next) => {
   
   try {
-  
-    const filter = { _id: req.params.battletag };
+    const battletag = req.body.battletag;
+    const filter = { _id: battletag };
     
     PlayerMmr.findOne(filter, (err, playerMmr) => {
       if(err) return res.status(500).json({error: err});
@@ -41,7 +41,7 @@ router.get('/:battletag', async (req, res, next) => {
 });
 
 
-
+// 우선 add 버튼 누를 때 할 작업 모두 다...
 // first add to planTeam (only Name, Battletag, idPlanTeam + status)
 // heroesprofile api 에서 battletag 확인
 
@@ -70,52 +70,74 @@ router.put('/add', async (req, res, next) => {
     
     let objPlayerMmr;
     
-    try {
-      objPlayerMmr = await readPlayerMmr( battletag ); // read from heroesprofile
-      
-    } 
-      catch (error) { 
-      res.send("failed in reading from heroes profile api")
-    }
+    
+    objPlayerMmr = await readPlayerMmr( battletag ); // read from heroesprofile
     
     const newPlayerMmr = putMmrStandardToPlayerMmr(objPlayerMmr, 0); // including mmr standard
-    const update1 = {...newPlayerMmr, updated: dateUpdated } // including update date
-      
+    newPlayerMmr['updated'] = dateUpdated;
     
+    const update1 = newPlayerMmr // including update date
+      
+    console.log(update1)
     const option1 = {upsert: true }; // upser -> add if not exist
     
-    try {
-      await PlayerMmr.findOneAndUpdate(filter1, update1, option1);   // add to cPlayerMmr
-    }
-    catch (error) {
-      res.send("failed in reading from heroes profile api")
-    }
+    
+    await PlayerMmr.findOneAndUpdate(filter1, update1, option1);   // add to cPlayerMmr
+    
     
     ////////////////
     
-    // add/update to 
+  
     const filter2 = {
       _id: idPlanTeam
-      , "listPlayerEntry._id": battletag     
+      , "listPlayerEntry._id" : {$ne: battletag}  // 이미 목록에 있는 상태라면 건디리지 않는다.
     };
     
     const update2 = {
-      $set: { 
-        "listPlayerEntry.0._id" : battletag 
-        , "listPlayerEntry.0.name" : name 
-        , "listPlayerEntry.0.status" : status 
+      $push: {
+        listPlayerEntry: 
+        {
+          _id : battletag 
+          , name : name 
+          , status : status 
+        }
       }
-  	}
-    
-    const option2 = {upsert: true }; // upser -> add if not exist
-    
-    try {
-      await PlanTeam.findOneAndUpdate(filter2, update2, option2);   // add to cPlanTeam (can be updating too)
-      res.send("successfully added")
     }
-    catch (error) {
-      res.send("failed in adding my backend")
+  	// 더 공부하자
+  	// https://docs.mongodb.com/manual/reference/method/db.collection.updateOne/
+  	
+    await PlanTeam.updateOne(filter2, update2);
+      
+    
+    //////////////
+    
+    
+    let mmrForPlayerEntry = {
+      standard: {}
+      ,manual: {}
+    };
+    
+    mmrForPlayerEntry["standard"]["NA"] = newPlayerMmr["NA"]["STANDARD"]; // newPlayerMmr["NA"]["STANDARD"]
+    mmrForPlayerEntry["standard"]["EU"] = newPlayerMmr["EU"]["STANDARD"];
+    mmrForPlayerEntry["standard"]["KR"] = newPlayerMmr["KR"]["STANDARD"];
+    mmrForPlayerEntry["standard"]["CN"] = newPlayerMmr["CN"]["STANDARD"];
+    
+    
+    const filter3 = {
+      _id: idPlanTeam
+      ,"listPlayerEntry._id" : battletag
+    };
+    
+    const update3 = { 
+      $set: { 
+        "listPlayerEntry.$.mmr" : mmrForPlayerEntry 
+      } 
     }
+    
+    await PlanTeam.updateOne(filter3, update3);  
+   
+    
+    res.send("successfully added")
     
   } catch(error) { next(error) }
 })
@@ -123,6 +145,146 @@ router.put('/add', async (req, res, next) => {
 // refs
 // https://stackoverflow.com/questions/26328891/push-value-to-array-if-key-does-not-exist-mongoose
 // https://stackoverflow.com/questions/15921700/mongoose-unique-values-in-nested-array-of-objects
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 즉 read from heroes profile + update in cPlanTeam
+// 이미 추가된걸 알고 있는 플레이어에 대해서 mmr 추가/업데이트
+// 방안 1    // 다른 정보는 update-others 로 따로 하나만 더 만들자!
+router.put('/update-mmr', async (req, res, next) => {
+  try {
+    
+    
+    if ( !(req.body.idPlanTeam) ) { }
+    else if ( !(req.body.battlelog) ) { }
+   
+    
+    
+    const idPlanTeam = req.body.idPlanTeam;
+    const battletag = req.body.battletag;
+    
+    
+    const dateUpdated = Date.now();
+    const objPlayerMmr = await readPlayerMmr( battletag ); // read from heroesprofile
+    
+    const newPlayerMmr = putMmrStandardToPlayerMmr(objPlayerMmr, 0); // including mmr standard
+    newPlayerMmr['updated'] = dateUpdated;
+    
+    
+    const filter1 = {_id: battletag};
+    const update1 = newPlayerMmr // including update date
+      
+    
+    await PlayerMmr.findOneAndUpdate(filter1, update1);   // add to cPlayerMmr
+    
+    
+    ////////////////
+    
+  
+       
+    
+    const filter2 = {
+      _id: idPlanTeam
+      , "listPlayerEntry._id" : {$ne: battletag}  // 이미 목록에 있는 상태라면 건디리지 않는다.
+    };
+    
+    const update2 = {
+      $push: {
+        listPlayerEntry: 
+        {
+          _id : battletag 
+          , name : name 
+          , status : status 
+        }
+      }
+    }
+  	// 더 공부하자
+  	// https://docs.mongodb.com/manual/reference/method/db.collection.updateOne/
+  	
+    //const option2 = {upsert: true }; // upser -> add if not exist
+    
+    /*
+   
+      await PlanTeam.updateOne(filter2, update2);   // add to cPlanTeam (can be updating too)
+    */
+    
+    await PlanTeam.updateOne(filter2, update2);
+    
+      
+    res.send("successfully added")
+    
+    
+  } catch(error) { next(error) }
+})
+   
+
+
+// 방안 2
+//ex: ahr.avantwing.com/plan-team/1234465646313/addPlayer
+router.put('/update-mmr', async (req, res, next) => {
+  try {
+    
+    const idPlanTeam = req.body.idPlanTeam;
+    const battletag = req.body.battletag;
+    const status = req.body.status;
+    
+    
+    const playerMmr = await axios.get( `https://ahr.avantwing.com/player/${battletag}` ); // read from my database
+    
+    
+    //newPlayerMmr['updated'] = dateUpdated;
+    
+    let mmrForPlayerEntry = {
+      standard: {}
+      ,manual: {}
+    };
+    
+    mmrForPlayerEntry["standard"]["NA"] = 1111; // objPlayerMmr["NA"]["STANDARD"]
+    mmrForPlayerEntry["standard"]["EU"] = 2222;
+    mmrForPlayerEntry["standard"]["KR"] = 3333;
+    mmrForPlayerEntry["standard"]["CN"] = 4444;
+    
+    
+    const filter = {
+      _id: idPlanTeam
+      ,"listPlayerEntry._id" : battletag
+    };
+    
+    const update = 
+      { 
+        $set: { 
+          "listPlayerEntry.$.mmr" : mmrForPlayerEntry 
+        } 
+      }
+    
+    await PlanTeam.updateOne(filter, update);
+    
+    res.send("successfully updated")
+    
+  } catch(error) { next(error) }
+})
+      
+      
+      
+module.exports = router;
+
+    
+    
+    
+    
+    
+    
     
     
         
@@ -274,4 +436,3 @@ router.put('/:battletag', async (req, res, next) => {
 
 
 
-module.exports = router;

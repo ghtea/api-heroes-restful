@@ -2,6 +2,20 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 
+var schemaRoleGames = new Schema({
+  _id: String,
+  
+  Tank: Number,
+  Bruiser: Number,
+  "Melee Assassin": Number,
+  "Ranged Assassin": Number,
+  Healer: Number,
+  Support: Number,
+
+  updated: Date
+  
+});
+
 
 var schemaMmr = new Schema({
   _id: String,
@@ -33,19 +47,13 @@ var schemaPlayerEntry = new Schema({
   status: String,
   
   mmr: schemaMmr,
+  regions:[String], // 특정 게임 이상 지역, 그 이하면 그나마 게임한 지역 1개
   
-  roleGame: {
-    auto: [String],
-    manual: [String]
-  },
+  roles: [String],
   
-  roleReal: [String],
+  groups: [String],
   
-  group: [String],
-  
-  language: [String],
-  
-  tag: [String]
+  tags: [String]
   
 });
 
@@ -61,24 +69,32 @@ var schemaTeamGenerated = new Schema({
 
 var schemaResultTeam = new Schema({
   _id: String,
+  added: Date,
+  listGroup: [String],
   listTeam: [schemaTeamGenerated]
 });
  
+ 
+var schemaOptionTeam = new Schema({
+  _id: String,
+  region: String,
+  numberTeams: Number,
+  
+  numberGroups: Number,
+  listGroup: [String],
+});
+
 
 var schemaPlanTeam = new Schema({
   _id: String,
   password: String,
   title: String,
   
-  region: String,
-  
-
-  listGroup: [String],
-  
   listPlayerEntry: [schemaPlayerEntry],
+  
   listResult: [schemaResultTeam],
   
-  option: String
+  option: schemaOptionTeam
   
 }, { collection: 'cPlanTeam', versionKey: false});
 

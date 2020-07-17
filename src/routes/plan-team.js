@@ -30,8 +30,16 @@ router.post('/', async (req, res, next) => {
         _id: req.body._id
         , password: req.body.password
         , title: req.body.title
-        
+        , option: {
+          region: req.body.region
+          , numberTeams: 0
+          , numberGroups: 0
+        }
       });
+      
+    //planTeam.option.region = req.body.region;
+    
+    //planTeam.markModified('option.region'); // https://stackoverflow.com/questions/24054552/mongoose-not-saving-nested-object
     
     await planTeam.save();
     
@@ -70,7 +78,7 @@ router.get('/:idPlanTeam', async (req, res, next) => {
 // ?: promise 반환할 필요없이 response 만 반환하면 될듯?
 // 이미 존재 확실한, planTeam, player(battletag) 에 대해서 업데이트
 // 예: 특정 플레이어 mmr planTeam 에 넣기
-router.put('/:idPlanTeam', async (req, res, next) => {
+router.put('/', async (req, res, next) => {
   try {
   
     if (req.body.filter && req.body.update) {

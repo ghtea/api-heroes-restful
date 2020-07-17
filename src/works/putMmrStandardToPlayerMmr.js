@@ -64,7 +64,8 @@ const moveCertainElementToFront = (array, value) => {
 const makeOrderRegion = (playerMmr) => {
   
 	let listRegion = ["NA", "KR", "EU", "CN"];
-	const listMode = ["SL", "QM"];
+	//const listMode = ["SL", "QM"];
+	const listMode = ["SL", "QM", "HL", "TL", "UD" ];
 	
 	let numGames = {
 	  "NA": 0,
@@ -95,14 +96,33 @@ const makeOrderRegion = (playerMmr) => {
 	//  .sort changes original array (listRegion)
 	let orderRegion = listRegion.sort( (region1, region2) => { 
     return (numGames[region2] - numGames[region1]);
-    // ex: 1,2,5,10,...
+   
   });
   
 	console.log(`number of games (SL + QM): (below)`)
 	console.log(numGames)
 	console.log(`order of regions: ${orderRegion}`)
 	
-	return orderRegion;
+	
+	// 활동지역 알아내기!!! (기준 게임수 100개 이상)
+	let listRegionMain = [];
+	
+	for (var iRegion = 0; iRegion < orderRegion.length; iRegion++) {
+	  const cRegion = orderRegion[iRegion];
+    if (numGames[cRegion] >= 50 ) {
+		  listRegionMain.push(cRegion)
+    }
+	}
+	if (listRegionMain === []) {  // 50개 이상 지역 없으면 그나마 제일 게임수 많은 지역 반환
+	  listRegionMain.push(orderRegion[0])
+	}
+	
+	const result = {
+	  listRegionMain
+	  , orderRegion
+	}
+	
+	return result;
 }
 
 
@@ -162,14 +182,23 @@ const returnMmrStandardInEachRegion = (playerMmr, orderRegionPersonal, regionSta
 }
 
 
+export const returnListRegionMain = (playerMmr) => {
+  const result1 = makeOrderRegion(playerMmr);
+  const listRegionMain = result1.listRegionMain;
+  //console.log(listRegionMain);
+  return listRegionMain;
+}
 
-
-const putMmrStandardToPlayerMmr = (playerMmr, mmrDefault) => {
+export const putMmrStandardToPlayerMmr = (playerMmr, mmrDefault) => {
   
   const listRegion = ["NA", "EU", "KR", "CN"];
   
   // order is based on number of games of certain Player on each region
-  const orderRegionPersonal = makeOrderRegion(playerMmr);
+  const result1 = makeOrderRegion(playerMmr);
+  
+  const listRegionMain = result1.listRegionMain;
+  const orderRegionPersonal = result1.orderRegion;
+  
   //const orderRegionPersonal = ["NA", "KR", "EU", "CN"];  // use sample first
   
   for (var iRegion = 0; iRegion < listRegion.length; iRegion++) {
@@ -183,7 +212,5 @@ const putMmrStandardToPlayerMmr = (playerMmr, mmrDefault) => {
   return playerMmr;
 }
 
-//const newPlayerMmr = putMmrStandardToPlayerMmr(playerMmr, 1800);
-
-
-export default putMmrStandardToPlayerMmr;
+//returnListRegionMain(playerMmr);
+//console.log(newPlayerMmr)
