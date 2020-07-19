@@ -53,18 +53,12 @@ router.put('/add', async (req, res, next) => {
   try {
     
     
-    if ( !(req.body.idPlanTeam) ) { }
-    else if ( !(req.body.battlelog) ) { }
-    else if ( !(req.body.name) ) { }
-    else if ( !(req.body.status) ) { }
-    
-    
     const idPlanTeam = req.body.idPlanTeam;
     const battletag = req.body.battletag;
-    const name = req.body.name;
+    //const name = req.body.name;
     const status = req.body.status;
     
-    console.log(idPlanTeam, battletag, name, status)
+
     
     // add/replace to cPlayerMmr
     const filter1 = {_id: battletag};
@@ -103,7 +97,7 @@ router.put('/add', async (req, res, next) => {
         listPlayerEntry: 
         {
           _id : battletag 
-          , name : name 
+          //, name : name 
           , status : status 
         }
       }

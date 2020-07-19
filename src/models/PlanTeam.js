@@ -69,10 +69,13 @@ var schemaTeamGenerated = new Schema({
 
 var schemaResultTeam = new Schema({
   _id: String,
+  title: String,
   added: Date,
   listGroup: [String],
   listTeam: [schemaTeamGenerated]
 });
+ 
+ 
  
  
 var schemaOptionTeam = new Schema({
